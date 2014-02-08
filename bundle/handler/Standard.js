@@ -12,6 +12,7 @@ var proto = Standard.prototype;
 
 proto.match = function(request, response, route)
 {
+    return true;
 };
 
 module.exports = Standard;

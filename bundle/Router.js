@@ -1,5 +1,8 @@
 var solfege = require('solfegejs');
 var StandardHandler = require('./handler/Standard');
+var controllerPackage = require('./controller');
+var policyPackage = require('./policy');
+
 
 /**
  * A simple router for the HTTP server
@@ -11,6 +14,8 @@ var Router = solfege.util.Class.create(function()
 
     // Initialize properties
     this.standardHandler = new StandardHandler();
+    this.controller = controllerPackage;
+    this.policy = policyPackage;
 
     // Set the default configuration
     this.configuration = require('../configuration/default.js');
@@ -26,6 +31,14 @@ solfege.util.Object.define(Router, 'EVENT_ROUTES', 'routes');
 solfege.util.Object.define(Router, 'HANDLER_STANDARD', 'standard');
 solfege.util.Object.define(Router, 'HANDLER_REGEXP', 'regexp');
 
+
+/**
+ * The application instance
+ *
+ * @type {solfege.kernel.Application}
+ * @api private
+ */
+proto.application;
 
 /**
  * The configuration
@@ -50,6 +63,32 @@ proto.defaultHandler;
  * @api private
  */
 proto.standardHandler;
+
+/**
+ * The controller package
+ *
+ * @type {Object}
+ * @api public
+ */
+proto.controller;
+
+/**
+ * The policy package
+ *
+ * @type {Object}
+ * @api public
+ */
+proto.policy;
+
+/**
+ * Set the application
+ *
+ * @param   {solfege.kernel.Application}    application     Application instance
+ */
+proto.setApplication = function*(application)
+{
+    this.application = application;
+};
 
 /**
  * Override the current configuration
@@ -129,8 +168,27 @@ proto.middleware = function*(request, response, next)
         // Apply policies
         // @todo
 
+        // Create the controller instance
+        var controller;
+        if ('string' === typeof route.controller) {
+            var controllerClass = this.application.parseSolfegeUri(route.controller, this);
+            controller = new controllerClass();
+        } else if ('function' === typeof route.controller) {
+            controller = route.controller;
+        }
+        if (!controller) {
+            throw new Error('Invalid controller "' + route.controller + '" in the route "' + route.id + '"');
+        }
+
         // Execute the action of the selected controller
-        // @todo
+        if (controller) {
+            var action = controller[route.action];
+            if ('function' !== typeof action || 'GeneratorFunction' !== action.constructor.name) {
+                throw new Error('Invalid action "' + route.action + '" in the route "' + route.id + '". You must select a generator function.');
+            }
+
+            yield action.call(controller, request, response);
+        }
     }
 
     // Execute the next middleware

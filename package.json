@@ -12,6 +12,6 @@
     },
     "dependencies"  :
     {
-        "solfegejs"     : "1.0.x"
+        "solfegejs"     : "1.1.x"
     }
 }
