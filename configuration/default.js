@@ -19,6 +19,13 @@ module.exports = {
             controller: '@this.controller.Home',
             action: 'index',
             policies: [] // Optional
+        },
+        {
+            id: 'hello',
+            url: '/hello/:name/iam/:age',
+            controller: '@this.controller.Home',
+            action: 'hello'
         }
+
     ]
 };
