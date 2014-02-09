@@ -14,6 +14,7 @@ var Router = solfege.util.Class.create(function()
 
     // Initialize properties
     this.standardHandler = new StandardHandler();
+    this.controllerCache = {};
     this.controller = controllerPackage;
     this.policy = policyPackage;
 
@@ -63,6 +64,14 @@ proto.defaultHandler;
  * @api private
  */
 proto.standardHandler;
+
+/**
+ * Cache of the controller instances
+ *
+ * @type {Object}
+ * @api private
+ */
+proto.controllerCache;
 
 /**
  * The controller package
@@ -119,6 +128,7 @@ proto.parseConfiguration = function()
 
 /**
  * The server middleware
+ * The goal is to execute an action of a controller
  *
  * @param   {solfege.bundle.server.Request}     request     The request
  * @param   {solfege.bundle.server.Response}    response    The response
@@ -126,6 +136,8 @@ proto.parseConfiguration = function()
  */
 proto.middleware = function*(request, response, next)
 {
+    var skip = false;
+
     // Get a clone of the general routes
     var routes = [];
     if (this.configuration.routes) {
@@ -137,10 +149,48 @@ proto.middleware = function*(request, response, next)
     yield this.emit(Router.EVENT_ROUTES, request, response, routes);
 
     // Find the route
+    var route = this.getRoute(routes, request, response);
+    skip = (!route);
+
+    // Apply policies
+    if (!skip) {
+        var policiesResult = yield this.applyPolicies(route, request, response);
+        skip = (!policiesResult);
+    }
+
+    // Create the controller instance
+    if (!skip) {
+        var controller = this.getController(route);
+        skip = (!controller);
+    }
+
+    // Execute the action of the selected controller
+    if (!skip) {
+        var action = controller[route.action];
+        if ('function' !== typeof action || 'GeneratorFunction' !== action.constructor.name) {
+            throw new Error('Invalid action "' + route.action + '" in the route "' + route.id + '". You must select a generator function.');
+        }
+
+        yield action.call(controller, request, response);
+    }
+
+    // Execute the next middleware
+    yield *next;
+};
+
+/**
+ * Get the route that match the request
+ *
+ * @param   {Array}                             routes      The routes
+ * @param   {solfege.bundle.server.Request}     request     The request
+ * @param   {solfege.bundle.server.Response}    response    The response
+ */
+proto.getRoute = function(routes, request, response)
+{
+    // Find the route
     var routeCount = routes.length;
     var routeIndex;
     var route;
-    var routeFound = false;
     for (routeIndex = 0; routeIndex < routeCount; ++routeIndex) {
         route = routes[routeIndex];
 
@@ -158,41 +208,92 @@ proto.middleware = function*(request, response, next)
         // If the route matches the request, then stop here
         var matched = handler.match(request, response, route);
         if (matched) {
-            routeFound = true;
-            break;
+            return route;
         }
     }
 
-    // The route is found
-    if (routeFound) {
-        // Apply policies
-        // @todo
+    return null;
+};
 
-        // Create the controller instance
-        var controller;
-        if ('string' === typeof route.controller) {
+/**
+ * Apply the policies
+ *
+ * @param   {Object}                            route       The route
+ * @param   {solfege.bundle.server.Request}     request     The request
+ * @param   {solfege.bundle.server.Response}    response    The response
+ */
+proto.applyPolicies = function*(route, request, response)
+{
+    // Get the available policies
+    var availablePolicies = this.configuration.policies || [];
+
+    // Get the policies to apply
+    var policies = route.policies || [];
+
+    // Apply the policies
+    var total = policies.length;
+    var index;
+    for (index = 0; index < total; ++index) {
+        var policy = policies[index];
+
+        // The policy is a string, check the available policies
+        if ('string' === typeof policy && availablePolicies.hasOwnProperty(policy)) {
+            policy = availablePolicies[policy];
+        }
+
+        // The policy is a string, check if it is a solfege URI
+        if ('string' === typeof policy) {
+            policy = this.application.parseSolfegeUri(policy, this);
+        }
+
+        // Check if the policy is a generator function
+        if ('function' !== typeof policy || 'GeneratorFunction' !== policy.constructor.name) {
+            continue;
+        }
+
+        // Execute the policy
+        var policyResult = yield policy(request, response);
+        if (!policyResult) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
+/**
+ * Get the controller instance
+ *
+ * @param   {Object}    route       The route
+ */
+proto.getController = function(route)
+{
+    var controller;
+
+    if ('string' === typeof route.controller) {
+        // The controller is a solfege uri
+
+        // Check the cache
+        // Create the instance if necessary
+        if (this.controllerCache.hasOwnProperty(route.controller)) {
+            controller = this.controllerCache[route.controller];
+        } else {
             var controllerClass = this.application.parseSolfegeUri(route.controller, this);
             controller = new controllerClass();
-        } else if ('function' === typeof route.controller) {
-            controller = route.controller;
-        }
-        if (!controller) {
-            throw new Error('Invalid controller "' + route.controller + '" in the route "' + route.id + '"');
+
+            // Save into the cache
+            this.controllerCache[route.controller] = controller;
         }
 
-        // Execute the action of the selected controller
-        if (controller) {
-            var action = controller[route.action];
-            if ('function' !== typeof action || 'GeneratorFunction' !== action.constructor.name) {
-                throw new Error('Invalid action "' + route.action + '" in the route "' + route.id + '". You must select a generator function.');
-            }
-
-            yield action.call(controller, request, response);
-        }
+    } else if ('function' === typeof route.controller) {
+        // The controller instance is already created
+        controller = route.controller;
     }
 
-    // Execute the next middleware
-    yield *next;
+    if (!controller) {
+        throw new Error('Invalid controller "' + route.controller + '" in the route "' + route.id + '"');
+    }
+    return controller;
 };
 
 module.exports = Router;

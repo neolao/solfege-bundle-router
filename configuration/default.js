@@ -24,7 +24,8 @@ module.exports = {
             id: 'hello',
             url: '/hello/:name/iam/:age',
             controller: '@this.controller.Home',
-            action: 'hello'
+            action: 'hello',
+            policies: ['nop']
         }
 
     ]
