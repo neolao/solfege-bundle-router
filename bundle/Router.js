@@ -103,6 +103,7 @@ proto.setApplication = function*(application)
  * Override the current configuration
  *
  * @param   {Object}    customConfiguration     The custom configuration
+ * @api public
  */
 proto.overrideConfiguration = function*(customConfiguration)
 {
@@ -114,6 +115,8 @@ proto.overrideConfiguration = function*(customConfiguration)
 
 /**
  * Parse the configuration and initialize properties
+ *
+ * @api private
  */
 proto.parseConfiguration = function()
 {
