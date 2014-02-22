@@ -246,7 +246,7 @@ proto.applyPolicies = function*(route, request, response)
 
         // The policy is a string, check if it is a solfege URI
         if ('string' === typeof policy) {
-            policy = this.application.parseSolfegeUri(policy, this);
+            policy = this.application.resolveSolfegeUri(policy, this);
         }
 
         // Check if the policy is a generator function
@@ -281,7 +281,7 @@ proto.getController = function(route)
         if (this.controllerCache.hasOwnProperty(route.controller)) {
             controller = this.controllerCache[route.controller];
         } else {
-            var controllerClass = this.application.parseSolfegeUri(route.controller, this);
+            var controllerClass = this.application.resolveSolfegeUri(route.controller, this);
             controller = new controllerClass();
 
             // Save into the cache
