@@ -102,8 +102,7 @@ proto.setApplication = function*(application)
 /**
  * Override the current configuration
  *
- * @param   {Object}    customConfiguration     The custom configuration
- * @api public
+ * @param   {Object} customConfiguration - The custom configuration
  */
 proto.overrideConfiguration = function*(customConfiguration)
 {
@@ -184,9 +183,10 @@ proto.middleware = function*(request, response, next)
 /**
  * Get the route that match the request
  *
- * @param   {Array}                             routes      The routes
- * @param   {solfege.bundle.server.Request}     request     The request
- * @param   {solfege.bundle.server.Response}    response    The response
+ * @param   {Array} routes - The routes
+ * @param   {solfege.bundle.server.Request} request - The request
+ * @param   {solfege.bundle.server.Response} response - The response
+ * @return  {Object} The matching route
  */
 proto.getRoute = function(routes, request, response)
 {

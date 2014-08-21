@@ -19,21 +19,23 @@ var proto = Standard.prototype;
  */
 proto.match = function(request, response, route)
 {
-    var url = route.url;
+    var nodeUrl = require('url');
+    var routeUrl = route.url;
+    var requestObject = nodeUrl.parse(request.url, true);
 
     // Build the pattern
-    var routeSplitted = url.split(/:[a-zA-Z]+/);
+    var routeSplitted = routeUrl.split(/:[a-zA-Z]+/);
     var pattern = new RegExp('^' + routeSplitted.join('([^/]+)') + '$');
 
-    if (pattern.test(request.url)) {
+    if (pattern.test(requestObject.pathname)) {
         // The request matches the route
 
         // Set the parameter values
-        var parameterValues = pattern.exec(request.url);
+        var parameterValues = pattern.exec(requestObject.pathname);
         parameterValues.shift();
         var parameterCount = parameterValues.length;
         var parameterPattern = /:[a-zA-Z]+/g;
-        var parameterNames = url.match(parameterPattern);
+        var parameterNames = routeUrl.match(parameterPattern);
         for (var index = 0; index < parameterCount; ++index) {
             var parameterName = parameterNames[index].substr(1);
             var parameterValue = parameterValues[index];
