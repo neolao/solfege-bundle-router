@@ -5,14 +5,7 @@
  * @param   {solfege.bundle.server.Response}    response    The response
  * @return  {Boolean}                                       true
  */
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports["default"] = function* (request, response) {
-  return true;
-};
-
-module.exports = exports["default"];
+export default function*(request, response)
+{
+    return true;
+}
