@@ -1,7 +1,7 @@
 var http = require('http');
 var solfege = require('solfegejs');
 var Router = require('../bundle/Router');
-var co = require('co');
+var mochaSetup = require('./mochaSetup');
 var expect = require('chai').expect;
 var should = require('chai').should();
 
@@ -16,21 +16,21 @@ describe('Router', function()
     /**
      * Initialize the test suite
      */
-    before(co(function*()
+    before(function()
     {
         // Initialize the application
         application = new Application(__dirname);
 
-    }));
+    });
 
 
     /**
      * Test the getRoute() function
      */
-    describe('#getRoute()', co(function*()
+    describe('#getRoute()', function()
     {
         // Standard handler - simple url
-        it('should get route from a simple URL', co(function*()
+        it('should get route from a simple URL', function()
         {
             // Add the router bundle, configure it and start the application
             var router = new Router;
@@ -49,10 +49,10 @@ describe('Router', function()
             expect(routes).to.contain(result);
             result = router.getRoute(routes, { url: '/bar-ok' }, {});
             expect(routes).to.contain(result);
-        }));
+        });
 
         // Standard handler - URL with query string
-        it('should get route from an URL with query string', co(function*()
+        it('should get route from an URL with query string', function()
         {
             // Add the router bundle, configure it and start the application
             var router = new Router;
@@ -71,8 +71,8 @@ describe('Router', function()
             expect(routes).to.contain(result);
             result = router.getRoute(routes, { url: '/bar-ok?' }, {});
             expect(routes).to.contain(result);
-        }));
+        });
 
-    }));
+    });
 });
 
