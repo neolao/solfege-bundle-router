@@ -16,6 +16,7 @@
     },
     "devDependencies":
     {
+        "co"            : "4.5.*",
         "babel"         : "5.8.*",
         "babel-plugin-object-assign" : "1.2.*",
         "chai"          : "2.3.*",

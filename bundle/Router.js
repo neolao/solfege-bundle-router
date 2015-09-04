@@ -106,6 +106,9 @@ var Router = (function (_solfege$kernel$EventEmitter) {
         // Set the default configuration
         this._configuration = require('../configuration/default.js');
 
+        // The application instance
+        this._application = null;
+
         // Parse the configuration
         this.parseConfiguration();
     }
@@ -186,26 +189,20 @@ var Router = (function (_solfege$kernel$EventEmitter) {
             // Note: For example, you can override the routes for this request
             yield this.emit(Router.EVENT_ROUTES, request, response, routes);
 
-            // Find the route
-            var route = this.getRoute(routes, request, response);
-            skip = !route;
-
-            // Apply policies
-            var policiesResult = null;
-            if (!skip) {
-                policiesResult = yield this.applyPolicies(route, request, response);
+            // Check the routes that match the URL and policies
+            var route = yield this.getRoute(routes, request, response);
+            if (!route) {
+                skip = true;
             }
-            skip = !policiesResult;
 
             // Create the controller instance
             var controller = null;
             if (!skip) {
                 controller = this.getController(route);
             }
-            skip = !controller;
 
             // Execute the action of the selected controller
-            if (!skip) {
+            if (controller) {
                 var action = controller[route.action];
                 if ("function" !== typeof action || "GeneratorFunction" !== action.constructor.name) {
                     throw new Error("Invalid action \"" + route.action + "\" in the route \"" + route.id + "\".\n                     You must select a generator function.");
@@ -219,7 +216,7 @@ var Router = (function (_solfege$kernel$EventEmitter) {
         }
 
         /**
-         * Get the route that match the request
+         * Get the route that match the request and validate the policies
          *
          * @private
          * @param   {Array} routes - The routes
@@ -229,7 +226,38 @@ var Router = (function (_solfege$kernel$EventEmitter) {
          */
     }, {
         key: "getRoute",
-        value: function getRoute(routes, request, response) {
+        value: function* getRoute(routes, request, response) {
+            // Check the routes that match the URL
+            var controller = null;
+            var route = undefined;
+            var nextRoute = this.getNextRoute(routes, request, response);
+            while (route = nextRoute.next().value) {
+
+                // Apply policies
+                var policiesResult = null;
+                policiesResult = yield this.applyPolicies(route, request, response);
+                if (!policiesResult) {
+                    continue;
+                }
+
+                return route;
+            }
+
+            return null;
+        }
+
+        /**
+         * Get the route that match the request
+         *
+         * @private
+         * @param   {Array} routes - The routes
+         * @param   {solfege.bundle.server.Request} request - The request
+         * @param   {solfege.bundle.server.Response} response - The response
+         * @return  {Object} The matching route
+         */
+    }, {
+        key: "getNextRoute",
+        value: function* getNextRoute(routes, request, response) {
             // Find the route
             var routeCount = routes.length;
             var routeIndex = undefined;
@@ -251,11 +279,9 @@ var Router = (function (_solfege$kernel$EventEmitter) {
                 // If the route matches the request, then stop here
                 var matched = handler.match(request, response, route);
                 if (matched) {
-                    return route;
+                    yield route;
                 }
             }
-
-            return null;
         }
 
         /**

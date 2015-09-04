@@ -6,7 +6,15 @@ module.exports = {
 
     // The policies
     policies: {
-        nop: '@this.policy.nop'
+        nop: '@this.policy.nop',
+        methodIsConnect: '@this.policy.methodIsConnect',
+        methodIsDelete: '@this.policy.methodIsDelete',
+        methodIsGet: '@this.policy.methodIsGet',
+        methodIsHead: '@this.policy.methodIsHead',
+        methodIsOptions: '@this.policy.methodIsOptions',
+        methodIsPost: '@this.policy.methodIsPost',
+        methodIsPut: '@this.policy.methodIsPut',
+        methodIsTrace: '@this.policy.methodIsTrace'
     },
 
     // The routes

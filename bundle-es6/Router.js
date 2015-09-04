@@ -69,6 +69,9 @@ export default class Router extends solfege.kernel.EventEmitter
         // Set the default configuration
         this._configuration = require('../configuration/default.js');
 
+        // The application instance
+        this._application = null;
+
         // Parse the configuration
         this.parseConfiguration();
     }
@@ -159,26 +162,20 @@ export default class Router extends solfege.kernel.EventEmitter
         // Note: For example, you can override the routes for this request
         yield this.emit(Router.EVENT_ROUTES, request, response, routes);
 
-        // Find the route
-        let route = this.getRoute(routes, request, response);
-        skip = (!route);
-
-        // Apply policies
-        let policiesResult = null;
-        if (!skip) {
-            policiesResult = yield this.applyPolicies(route, request, response);
+        // Check the routes that match the URL and policies
+        let route = yield this.getRoute(routes, request, response);
+        if (!route) {
+            skip = true;
         }
-        skip = (!policiesResult);
 
         // Create the controller instance
         let controller = null;
         if (!skip) {
             controller = this.getController(route);
         }
-        skip = (!controller);
 
         // Execute the action of the selected controller
-        if (!skip) {
+        if (controller) {
             let action = controller[route.action];
             if ("function" !== typeof action || "GeneratorFunction" !== action.constructor.name) {
                 throw new Error(
@@ -195,6 +192,36 @@ export default class Router extends solfege.kernel.EventEmitter
     }
 
     /**
+     * Get the route that match the request and validate the policies
+     *
+     * @private
+     * @param   {Array} routes - The routes
+     * @param   {solfege.bundle.server.Request} request - The request
+     * @param   {solfege.bundle.server.Response} response - The response
+     * @return  {Object} The matching route
+     */
+    *getRoute(routes, request, response)
+    {
+        // Check the routes that match the URL
+        let controller = null;
+        let route;
+        let nextRoute = this.getNextRoute(routes, request, response);
+        while (route = nextRoute.next().value) {
+
+            // Apply policies
+            let policiesResult = null;
+            policiesResult = yield this.applyPolicies(route, request, response);
+            if (!policiesResult) {
+                continue;
+            }
+
+            return route;
+        }
+
+        return null;
+    }
+
+    /**
      * Get the route that match the request
      *
      * @private
@@ -203,7 +230,7 @@ export default class Router extends solfege.kernel.EventEmitter
      * @param   {solfege.bundle.server.Response} response - The response
      * @return  {Object} The matching route
      */
-    getRoute(routes, request, response)
+    *getNextRoute(routes, request, response)
     {
         // Find the route
         let routeCount = routes.length;
@@ -226,11 +253,10 @@ export default class Router extends solfege.kernel.EventEmitter
             // If the route matches the request, then stop here
             let matched = handler.match(request, response, route);
             if (matched) {
-                return route;
+                yield route;
             }
         }
 
-        return null;
     }
 
     /**
