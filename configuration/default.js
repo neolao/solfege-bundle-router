@@ -10,6 +10,7 @@ module.exports = {
         methodIsConnect: '@this.policy.methodIsConnect',
         methodIsDelete: '@this.policy.methodIsDelete',
         methodIsGet: '@this.policy.methodIsGet',
+        methodIsGetOrHead: '@this.policy.methodIsGetOrHead',
         methodIsHead: '@this.policy.methodIsHead',
         methodIsOptions: '@this.policy.methodIsOptions',
         methodIsPost: '@this.policy.methodIsPost',
