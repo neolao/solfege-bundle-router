@@ -1,14 +1,14 @@
 {
     "name"          : "solfegejs-server-router",
     "description"   : "Router bundle of the SolfegeJS server",
-    "version"       : "1.4.1",
+    "version"       : "1.4.2",
     "author"        : "neolao <contact@neolao.com>",
     "repository"    : "https://github.com/neolao/solfege-bundle-router.git",
     "license"       : "MIT",
     "main"          : "bundle/index.js",
     "engines"       : 
     {
-        "node": ">= 0.12"
+        "node": ">=0.12 <4.0"
     },
     "dependencies"  :
     {

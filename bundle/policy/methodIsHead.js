@@ -8,11 +8,15 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 
 exports["default"] = function* (request, response) {
-  return request.method === "HEAD";
+    if (request.method === "OPTIONS") {
+        return true;
+    }
+
+    return request.method === "HEAD";
 };
 
 module.exports = exports["default"];

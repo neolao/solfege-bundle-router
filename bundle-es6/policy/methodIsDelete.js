@@ -7,5 +7,8 @@
  */
 export default function*(request, response)
 {
+    if (request.method === "OPTIONS") {
+        return true;
+    }
     return (request.method === "DELETE");
 }
