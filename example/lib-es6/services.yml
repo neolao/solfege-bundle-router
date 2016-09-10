@@ -1,0 +1,20 @@
+services:
+
+    # Start command
+    example_start:
+        class: "Command/StartCommand"
+        tags:
+            - { name: "solfege.console.command" }
+
+    # Add router to the default server
+    example_router:
+        class: "@http_router_server_middleware"
+        calls:
+            - [loadRoutes, ["@http_router_loader_yaml", "%routes_path%"]]
+        tags:
+            - { name: "http_server_middleware" }
+
+    # Controllers
+    example_controller_default:
+        class: "Controller/DefaultController"
+

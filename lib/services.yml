@@ -1,0 +1,11 @@
+services:
+    # Server middleware
+    http_router_server_middleware:
+        class: "middlewares/RouterMiddleware"
+
+    # Routes loader for YAML file
+    http_router_loader_yaml:
+        class: "routes-loader/YamlLoader"
+        arguments:
+            - "@container"
+

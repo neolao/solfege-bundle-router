@@ -1,0 +1,6 @@
+
+routes_path: "%configuration_directory_path%/routes.yml"
+
+# HTTP Routeur configuration
+http_router:
+    debug: true
