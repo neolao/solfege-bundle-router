@@ -3,33 +3,21 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _ContainerAwareCommand = require("solfegejs/lib/bundles/Console/Command/ContainerAwareCommand");
-
-var _ContainerAwareCommand2 = _interopRequireDefault(_ContainerAwareCommand);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Start command
- */
-class StartCommand extends _ContainerAwareCommand2.default {
-    /**
-     * Configure command
-     */
-    *configure() {
-        this.setName("example:start");
-        this.setDescription("Start example");
+class StartCommand {
+    constructor(serverFactory) {
+        this.serverFactory = serverFactory;
     }
 
-    /**
-     * Execute the command
-     */
-    *execute() {
-        var container = this.getContainer();
-        var serverFactory = yield container.get("http_server_factory");
+    getName() {
+        return "example:start";
+    }
 
-        var defaultServer = serverFactory.create();
+    getDescription() {
+        return "Start example";
+    }
+
+    *execute() {
+        var defaultServer = this.serverFactory.create();
         defaultServer.start(8080);
 
         console.info("Example started");

@@ -1,17 +1,21 @@
-import ContainerAwareCommand from "solfegejs/lib/bundles/Console/Command/ContainerAwareCommand";
-
 /**
  * Start command
  */
-export default class StartCommand extends ContainerAwareCommand
+export default class StartCommand
 {
-    /**
-     * Configure command
-     */
-    *configure()
+    constructor(serverFactory)
     {
-        this.setName("example:start");
-        this.setDescription("Start example");
+        this.serverFactory = serverFactory;
+    }
+
+    getName()
+    {
+        return "example:start";
+    }
+
+    getDescription()
+    {
+        return "Start example";
     }
 
     /**
@@ -19,10 +23,7 @@ export default class StartCommand extends ContainerAwareCommand
      */
     *execute()
     {
-        let container = this.getContainer();
-        let serverFactory = yield container.get("http_server_factory");
-
-        let defaultServer = serverFactory.create();
+        let defaultServer = this.serverFactory.create();
         defaultServer.start(8080);
 
         console.info("Example started");
