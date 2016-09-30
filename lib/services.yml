@@ -9,3 +9,12 @@ services:
         arguments:
             - "@container"
 
+    # Debug command
+    http_router_debug:
+        class: "Command/DebugCommand"
+        arguments:
+            - "@http_server_factory"
+        tags:
+            - { name: "solfege.console.command" }
+
+

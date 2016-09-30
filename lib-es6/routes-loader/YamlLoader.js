@@ -1,7 +1,7 @@
 import {fn as isGenerator} from "is-generator";
 import configYaml from "config-yaml";
-import Routes from "./Routes";
-import Route from "./Route";
+import Routes from "../Routes";
+import Route from "../Route";
 
 /**
  * YAML loader for routes
@@ -55,6 +55,7 @@ export default class YamlLoader
         if (typeof controller !== "object") {
             throw new Error(`Invalid route ${id}, the controller is not a service`);
         }
+        route.setControllerId(controllerId);
         route.setController(controller);
 
         // Get action method name

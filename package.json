@@ -18,7 +18,9 @@
     "dependencies"  :
     {
         "config-yaml"       : "^1.0.4",
-        "is-generator"      : "^1.0.3"
+        "is-generator"      : "^1.0.3",
+        "easy-table"        : "^1.0",
+        "colors"            : "^1.1"
     },
     "devDependencies":
     {

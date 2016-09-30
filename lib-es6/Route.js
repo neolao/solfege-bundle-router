@@ -10,9 +10,11 @@ export default class Route
     {
         // Initialize properties
         this.id;
+        this.controllerId;
         this.controller;
         this.actionName;
         this.path;
+        this.methods = [];
         this.urlMatcherId = "standard";
     }
 
@@ -34,6 +36,26 @@ export default class Route
     setId(id:string)
     {
         this.id = id;
+    }
+
+    /**
+     * Get controller id
+     *
+     * @return  {string}    controller id
+     */
+    getControllerId()
+    {
+        return this.controllerId;
+    }
+
+    /**
+     * Set controller id
+     *
+     * @param   {string}    id      Controller id
+     */
+    setControllerId(id:string)
+    {
+        this.controllerId = id;
     }
 
     /**
@@ -114,5 +136,31 @@ export default class Route
     setUrlMatcherId(id:string)
     {
         this.urlMatcherId = id;
+    }
+
+    /**
+     * get methods
+     *
+     * @return  {Array}     Methods
+     */
+    getMethods()
+    {
+        return this.methods.slice(0);
+    }
+
+    /**
+     * Add method
+     *
+     * @param   {string}    name    Method name
+     */
+    addMethod(name:string)
+    {
+        let normalizedName:string = name.toUpperCase();
+
+        if (this.methods.indexOf(normalizedName) !== -1) {
+            return;
+        }
+
+        this.methods.push(normalizedName);
     }
 }

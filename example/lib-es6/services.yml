@@ -1,5 +1,4 @@
 services:
-
     # Start command
     example_start:
         class: "Command/StartCommand"

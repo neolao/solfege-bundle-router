@@ -1,6 +1,5 @@
 import {fn as isGenerator} from "is-generator";
-import YamlLoader from "../routes-loader/YamlLoader";
-import Routes from "../routes-loader/Routes";
+import Routes from "../Routes";
 import StandardUrlMatcher from "../url-matchers/Standard";
 
 /**
@@ -67,6 +66,16 @@ export default class RouterMiddleware
 
         // Add loaded routes to the main routes
         this.routes.addRoutes(routes);
+    }
+
+    /**
+     * Get routes
+     *
+     * @return  {Routes}    Routes instance
+     */
+    getRoutes()
+    {
+        return this.routes;
     }
 
     /**
