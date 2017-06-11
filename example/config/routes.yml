@@ -2,3 +2,8 @@ example_index:
     path:       /
     controller: "@example_controller_default"
     action:     index
+
+example_contact:
+    path:       /contact
+    controller: "@example_controller_default"
+    action:     contact

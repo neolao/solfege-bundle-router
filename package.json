@@ -1,7 +1,7 @@
 {
     "name": "solfegejs-server-router",
     "description": "Router bundle of the SolfegeJS server",
-    "version": "2.0.2",
+    "version": "2.0.3",
     "author": "neolao <contact@neolao.com>",
     "repository": "https://github.com/neolao/solfege-bundle-router.git",
     "license": "MIT",
@@ -11,7 +11,8 @@
     },
     "files": [
         "lib",
-        "src"
+        "src",
+        "interface.js"
     ],
     "peerDependencies": {
         "solfegejs": "2.x",
