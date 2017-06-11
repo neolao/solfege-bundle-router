@@ -1,6 +1,9 @@
+/* @flow */
 import Table from "easy-table"
 import colors from "colors"
 import RouterMiddleware from "../middlewares/RouterMiddleware"
+import type Route from "../Route"
+import type ServerFactory from "solfegejs-server/src/ServerFactory"
 
 /**
  * Debug command
@@ -8,11 +11,16 @@ import RouterMiddleware from "../middlewares/RouterMiddleware"
 export default class DebugCommand
 {
     /**
+     * Server factory
+     */
+    serverFactory:ServerFactory;
+
+    /**
      * Constructor
      *
-     * @param   {object}    serverFactory   HTTP server factory
+     * @param   {ServerFactory}     serverFactory   HTTP server factory
      */
-    constructor(serverFactory)
+    constructor(serverFactory:ServerFactory)
     {
         this.serverFactory = serverFactory;
     }
@@ -40,7 +48,7 @@ export default class DebugCommand
     /**
      * Execute the command
      */
-    *execute()
+    *execute():Generator<*,void,*>
     {
         let serverNames = this.serverFactory.getServerNames();
 
@@ -78,7 +86,7 @@ export default class DebugCommand
      * @param   {string}    serverName  Server name
      * @return  {Array}                 Routes
      */
-    *displayServerRoutes(serverName:string)
+    *displayServerRoutes(serverName:string):Generator<*,Array<Object>,*>
     {
         // Get router middleware
         let middlewares = this.serverFactory.getMiddlewares(serverName);
@@ -90,7 +98,7 @@ export default class DebugCommand
             }
         }
         if (!routerMiddleware) {
-            return;
+            return [];
         }
 
         // Get routes
@@ -99,7 +107,7 @@ export default class DebugCommand
 
         // Build a table rows
         let rows = [];
-        for (let route of list) {
+        for (let route:Route of list) {
             let controllerName = "";
             const controllerId = route.getControllerId();
             const controller = route.getController();

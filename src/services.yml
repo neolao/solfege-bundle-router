@@ -9,6 +9,12 @@ services:
         arguments:
             - "@container"
 
+    # Routes loader for a directory
+    http_router_loader_directory:
+        class: "routes-loader/DirectoryLoader"
+        arguments:
+            - "@container"
+
     # Debug command
     http_router_debug:
         class: "Command/DebugCommand"

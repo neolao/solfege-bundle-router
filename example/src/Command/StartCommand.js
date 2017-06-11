@@ -24,7 +24,7 @@ export default class StartCommand
     *execute()
     {
         let defaultServer = this.serverFactory.create();
-        defaultServer.start(8080);
+        defaultServer.start(8081);
 
         console.info("Example started");
     }

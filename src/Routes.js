@@ -1,10 +1,16 @@
-import Route from "./Route";
+/* @flow */
+import Route from "./Route"
 
 /**
  * Routes container
  */
 export default class Routes
 {
+    /**
+     * Route list
+     */
+    list:Array<Route>;
+
     /**
      * Constructor
      */
@@ -36,7 +42,6 @@ export default class Routes
      */
     addRoute(route:Route)
     {
-        let routeId = route.getId();
         this.list.push(route);
     }
 

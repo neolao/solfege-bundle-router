@@ -1,19 +1,51 @@
+/* @flow */
+
 /**
  * Route definition
  */
 export default class Route
 {
     /**
+     * Route identifier
+     */
+    id:string;
+
+    /**
+     * Controller ID
+     */
+    controllerId:string;
+
+    /**
+     * Controller instance
+     */
+    controller:*;
+
+    /**
+     * Action name
+     */
+    actionName:string;
+
+    /**
+     * Path
+     */
+    path:string;
+
+    /**
+     * Methods
+     */
+    methods:Array<string>;
+
+    /**
+     * URL matcher ID
+     */
+    urlMatcherId:string;
+
+    /**
      * Constructor
      */
     constructor()
     {
         // Initialize properties
-        this.id;
-        this.controllerId;
-        this.controller;
-        this.actionName;
-        this.path;
         this.methods = [];
         this.urlMatcherId = "standard";
     }
@@ -73,7 +105,7 @@ export default class Route
      *
      * @param   {object}    controller  Controller instance
      */
-    setController(controller)
+    setController(controller:*)
     {
         this.controller = controller;
     }

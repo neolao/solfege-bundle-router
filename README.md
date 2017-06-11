@@ -1,4 +1,4 @@
-solfege-bundle-router
-=====================
+Router bundle
+=============
 
 Router bundle of the SolfegeJS server

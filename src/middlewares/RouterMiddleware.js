@@ -1,12 +1,26 @@
-import {fn as isGenerator} from "is-generator";
-import Routes from "../Routes";
-import StandardUrlMatcher from "../url-matchers/Standard";
+/* @flow */
+import {fn as isGenerator} from "is-generator"
+import type {RequestInterface, ResponseInterface, MiddlewareInterface} from "solfegejs-server/interface"
+import type Route from "../Route"
+import type {RoutesLoaderInterface, UrlMatcherInterface} from "../../interface"
+import Routes from "../Routes"
+import StandardUrlMatcher from "../url-matchers/Standard"
 
 /**
  * Router middleware
  */
-export default class RouterMiddleware
+export default class RouterMiddleware implements MiddlewareInterface
 {
+    /**
+     * Routes
+     */
+    routes:Routes;
+
+    /**
+     * URL matchers
+     */
+    urlMatchers:Object;
+
     /**
      * Constructor
      */
@@ -24,10 +38,10 @@ export default class RouterMiddleware
     /**
      * Add URL matcher
      *
-     * @param   {string}    name        Matcher name
-     * @param   {object}    urlMatcher  Matcher instance
+     * @param   {string}                name        Matcher name
+     * @param   {UrlMatcherInterface}   urlMatcher  Matcher instance
      */
-    addUrlMatcher(name:string, urlMatcher)
+    addUrlMatcher(name:string, urlMatcher:UrlMatcherInterface):void
     {
         this.urlMatchers[name] = urlMatcher;
     }
@@ -55,14 +69,14 @@ export default class RouterMiddleware
     }
 
     /**
-     * Load routes from file path
+     * Load routes from path
      *
-     * @param   {object}    loader      Routes loader
-     * @param   {string}    filePath    Routes file path
+     * @param   {RoutesLoaderInterface} loader      Routes loader
+     * @param   {string}                path        Routes path
      */
-    *loadRoutes(loader, filePath:string)
+    *loadRoutes(loader:RoutesLoaderInterface, path:string):Generator<*,void,*>
     {
-        let routes = yield loader.load(filePath);
+        let routes = yield loader.load(path);
 
         // Add loaded routes to the main routes
         this.routes.addRoutes(routes);
@@ -81,11 +95,11 @@ export default class RouterMiddleware
     /**
      * Handle a request
      *
-     * @param   {Request}   request     The request
-     * @param   {Response}  response    The response
-     * @param   {object}    next        The next middleware
+     * @param   {RequestInterface}  request     HTTP request
+     * @param   {ResponseInterface} response    HTTP response
+     * @param   {object}            next        Next middleware
      */
-    *handle(request, response, next)
+    *handle(request:RequestInterface, response:ResponseInterface, next:*):Generator<*,*,*>
     {
         let routes = this.routes.getList();
 
@@ -127,18 +141,17 @@ export default class RouterMiddleware
      * Get the route that match the request and validate the policies
      *
      * @private
-     * @param   {Array}     routes      The routes
-     * @param   {Request}   request     The request
-     * @param   {Response}  response    The response
-     * @return  {Object}                The matching route
+     * @param   {Array}             routes      Routes
+     * @param   {RequestInterface}  request     HTTP request
+     * @param   {ResponseInterface} response    HTTP response
+     * @return  {Object}                        The matching route
      */
-    *getRoute(routes, request, response)
+    *getRoute(routes:Array<Route>, request:RequestInterface, response:ResponseInterface):Generator<*,*,void>
     {
         // Check the routes that match the URL
-        let controller = null;
         let route;
         let nextRoute = this.getNextRoute(routes, request, response);
-        while (route = nextRoute.next().value) {
+        while ((route = nextRoute.next().value)) {
             // Apply policies
             let policiesResult = null;
             policiesResult = yield this.applyPolicies(route, request, response);
@@ -156,12 +169,12 @@ export default class RouterMiddleware
      * Get the route that match the request
      *
      * @private
-     * @param   {Array}     routes      The routes
-     * @param   {Request}   request     The request
-     * @param   {Response}  response    The response
-     * @return  {Object}                The matching route
+     * @param   {Array}             routes      Routes
+     * @param   {RequestInterface}  request     HTTP request
+     * @param   {ResponseInterface} response    HTTP response
+     * @return  {Object}                        Matching route
      */
-    *getNextRoute(routes, request, response)
+    *getNextRoute(routes:Array<Route>, request:RequestInterface, response:ResponseInterface):Generator<*,*,void>
     {
         // Find the route
         let routeCount = routes.length;
@@ -189,14 +202,13 @@ export default class RouterMiddleware
      * Apply the policies
      *
      * @private
-     * @param   {Route}                             route       The route
-     * @param   {solfege.bundle.server.Request}     request     The request
-     * @param   {solfege.bundle.server.Response}    response    The response
+     * @param   {Route}             route       Route
+     * @param   {RequestInterface}  request     HTTP request
+     * @param   {ResponseInterface} response    HTTP response
      */
-    *applyPolicies(route, request, response)
+    *applyPolicies(route:Route, request:RequestInterface, response:ResponseInterface):Generator<*,*,*>
     {
-        return true;
-
+        /*
         // Get the available policies
         let availablePolicies = this.configuration.policies || [];
 
@@ -210,17 +222,17 @@ export default class RouterMiddleware
             let policy = policies[index];
 
             // The policy is a string, check the available policies
-            if ('string' === typeof policy && availablePolicies.hasOwnProperty(policy)) {
+            if ("string" === typeof policy && availablePolicies.hasOwnProperty(policy)) {
                 policy = availablePolicies[policy];
             }
 
             // The policy is a string, check if it is a solfege URI
-            if ('string' === typeof policy) {
+            if ("string" === typeof policy) {
                 policy = this.application.resolveSolfegeUri(policy, this);
             }
 
             // Check if the policy is a generator function
-            if ('function' !== typeof policy || 'GeneratorFunction' !== policy.constructor.name) {
+            if ("function" !== typeof policy || "GeneratorFunction" !== policy.constructor.name) {
                 continue;
             }
 
@@ -230,6 +242,7 @@ export default class RouterMiddleware
                 return false;
             }
         }
+        */
 
         return true;
     }

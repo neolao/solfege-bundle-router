@@ -12,6 +12,7 @@ services:
         class: "@http_router_server_middleware"
         calls:
             - [loadRoutes, ["@http_router_loader_yaml", "%routes_path%"]]
+            - [loadRoutes, ["@http_router_loader_directory", "%controllers_path%"]]
         tags:
             - { name: "http_server_middleware" }
 

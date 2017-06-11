@@ -4,10 +4,11 @@ const RouterBundle = require("../lib/Bundle");
 const MyBundle = require("./lib/Bundle");
 
 // Create application
-let application = solfege.factory();
-application.addBundle(new ServerBundle);
-application.addBundle(new RouterBundle);
-application.addBundle(new MyBundle);
+let application = solfege.factory([
+    new ServerBundle,
+    new RouterBundle,
+    new MyBundle
+]);
 
 // Load configuration
 application.loadConfigurationFile(`${__dirname}/config/default.yml`, "yaml");

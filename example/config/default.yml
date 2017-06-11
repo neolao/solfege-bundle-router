@@ -1,5 +1,6 @@
-
 routes_path: "%configuration_directory_path%/routes.yml"
+controllers_path: "%main_directory_path%/lib/Controller"
+
 
 # HTTP Routeur configuration
 http_router:

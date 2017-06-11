@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-class StartCommand {
+var StartCommand = class StartCommand {
     constructor(serverFactory) {
         this.serverFactory = serverFactory;
     }
@@ -18,10 +18,10 @@ class StartCommand {
 
     *execute() {
         var defaultServer = this.serverFactory.create();
-        defaultServer.start(8080);
+        defaultServer.start(8081);
 
         console.info("Example started");
     }
-}
+};
 exports.default = StartCommand;
-module.exports = exports['default'];
+module.exports = exports["default"];

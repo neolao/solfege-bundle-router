@@ -1,38 +1,38 @@
-import {fn as isGenerator} from "is-generator";
-import configYaml from "config-yaml";
-import Routes from "../Routes";
-import Route from "../Route";
+/* @flow */
+import {fn as isGenerator} from "is-generator"
+import Routes from "../Routes"
+import Route from "../Route"
+import type {ContainerInterface} from "solfegejs-dependency-injection/interface"
 
 /**
- * YAML loader for routes
+ * Directory loader for routes
  */
-export default class YamlLoader
+export default class DirectoryLoader
 {
+    /**
+     * SolfegeJS service container
+     */
+    container:ContainerInterface;
+
     /**
      * Constructor
      *
-     * @param   {object}    container   Solfege service container
+     * @param   {ContainerInterface}    container   SolfegeJS service container
      */
-    constructor(container)
+    constructor(container:ContainerInterface)
     {
         this.container = container;
     }
 
     /**
-     * Load YAML file
+     * Load directory containing controllers
      *
-     * @param   {string}    filePath    YAML file path
+     * @param   {string}    path        Directory path
      * @return  {Routes}                Routes container
      */
-    *load(filePath:string)
+    *load(path:string):Generator<void,Routes,void>
     {
         let routes = new Routes;
-
-        let config = configYaml(filePath, {encoding: "utf8"});
-        for (let routeId in config) {
-            let route = yield this.buildRoute(routeId, config[routeId]);
-            routes.addRoute(route);
-        }
 
         return routes;
     }
@@ -44,7 +44,7 @@ export default class YamlLoader
      * @param   {object}    config  Route configuration
      * @return  {Route}             Route instance
      */
-    *buildRoute(id:string, config)
+    *buildRoute(id:string, config:Object):Generator<*,Route,void>
     {
         let route = new Route;
         route.setId(id);
